@@ -24,7 +24,7 @@ class ApiEndpointForm(forms.ModelForm):
 
     class Meta:
         model = ApiEndpoint
-        fields = ("path", "method", "response", "response_rules", "callbacks")
+        fields = ("path", "method", "response")
 
 
 class ApiResponseForm(forms.ModelForm):

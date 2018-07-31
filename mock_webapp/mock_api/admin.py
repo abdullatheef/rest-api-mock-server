@@ -8,11 +8,17 @@ from django.contrib import messages
 from mock_api import callbacks
 from mock_api.forms import ApiResponseForm, ApiResponseRuleForm, ApiEndpointForm, ApiCallbackForm
 from mock_api.models import ApiEndpoint, AccessLog, ApiResponse, ApiResponseRule, ApiCallback
+admin.site.site_header = 'DJ Mock Server'
 
 
 class ApiResponseAdmin(admin.ModelAdmin):
     form = ApiResponseForm
+    list_display = ('name', 'status_code', 'get_data')
 
+    def get_data(self, obj):
+         return "<pre>%s</pre>" %obj.content
+    get_data.allow_tags = True
+    get_data.short_description = "Response"
 
 class ApiResponseRuleAdmin(admin.ModelAdmin):
     form = ApiResponseRuleForm
@@ -21,7 +27,11 @@ class ApiResponseRuleAdmin(admin.ModelAdmin):
 
 class ApiEndpointAdmin(admin.ModelAdmin):
     form = ApiEndpointForm
-    list_display = ('method', 'path', 'response')
+    list_display = ('method', 'path', 'get_data')
+    def get_data(self, obj):
+         return "<pre>%s</pre>" %obj.response.content
+    get_data.allow_tags = True
+    get_data.short_description = "Response"
 
 
 class ApiCallbackAdmin(admin.ModelAdmin):
@@ -62,7 +72,9 @@ class AccessLogAdmin(admin.ModelAdmin):
 
 
 admin.site.register(ApiResponse, ApiResponseAdmin)
-admin.site.register(ApiResponseRule, ApiResponseRuleAdmin)
-admin.site.register(ApiCallback, ApiCallbackAdmin)
+#dmin.site.register(ApiResponseRule, ApiResponseRuleAdmin)
+#admin.site.register(ApiCallback, ApiCallbackAdmin)
 admin.site.register(ApiEndpoint, ApiEndpointAdmin)
-admin.site.register(AccessLog, AccessLogAdmin)
+#admin.site.register(AccessLog, AccessLogAdmin)
+from django.contrib.auth.models import User, Group
+admin.site.unregister([User, Group])

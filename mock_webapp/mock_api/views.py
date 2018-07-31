@@ -4,6 +4,7 @@ import logging
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.renderers import JSONRenderer
 
 from mock_api import callbacks
 from mock_api.authentication import MockNoAuthentication
@@ -20,6 +21,7 @@ class MockApiView(APIView):
     authentication_classes = (MockNoAuthentication,)
     response_resolver_class = ResponseResolver
     api_endpoint = None
+    renderer_classes = (JSONRenderer, )
 
     def get(self, request):
         try:
@@ -36,18 +38,7 @@ class MockApiView(APIView):
             return Response(status=response.status_code, data=response.get_content())
         except (ApiEndpoint.DoesNotExist, MatchingResponseNotFound):
             logger.error("No api endpoint found for %s %s", request.method, request.path_info)
-            return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
-
-    def finalize_response(self, request, response, *args, **kwargs):
-        response = super(MockApiView, self).finalize_response(request, response, *args, **kwargs)
-
-        access_log = http_utils.log_request_and_response(request, response)
-        if self.api_endpoint:
-            access_log.api_endpoint = self.api_endpoint
-            access_log.save()
-
-        logger.debug("Access log entry was added: %s", access_log)
-        return response
+            return Response(data={"message": "URL not found"}, status=status.HTTP_404_NOT_FOUND)
 
     post = get
     patch = get
